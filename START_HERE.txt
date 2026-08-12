@@ -1,0 +1,4 @@
+Upload the CONTENTS of this folder to a new GitHub repo.
+Then enable Pages via GitHub Actions and run the workflow.
+
+This AKS-74U lab uses the supplied UE5.5 AKS-74U pack and builds a browser animation tester without needing Unreal Engine installed locally.

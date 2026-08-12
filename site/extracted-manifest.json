@@ -1,0 +1,8 @@
+{
+  "ready": false,
+  "generatedBy": "AKS-74U no-unreal lab",
+  "arms": "assets/extracted/aks74u_fp_arms.glb",
+  "weapon": "assets/extracted/aks74u_weapon.glb",
+  "armsAnimations": [],
+  "weaponAnimations": []
+}

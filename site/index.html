@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AKS-74U No-Unreal Animation Lab</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+<script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+</head>
+<body>
+<header><div><b>AKS-74U ANIMATION LAB</b><span>UE5.5 extraction + browser tester</span></div><div id="status" class="pill">Loading…</div></header>
+<main>
+<section id="viewport"><canvas id="renderCanvas"></canvas><div id="hint">R reload · Shift+R empty reload · F fire · E equip · H holster · Space play/pause</div></section>
+<aside>
+  <label>Asset source<select id="source"><option value="fallback">Current GLB fallback</option><option value="extracted" disabled>UE5.5 AKS-74U retargeted (not built yet)</option></select></label>
+  <div class="presets"><button data-preset="reload">Reload</button><button data-preset="reload_full">Empty Reload</button><button data-preset="fire">Fire</button><button data-preset="equip">Equip</button><button data-preset="holster">Holster</button><button data-preset="idle">Idle</button><button data-preset="run">Run</button></div>
+  <label>Arms animation<select id="armsAnim"></select></label>
+  <label>Weapon animation<select id="weaponAnim"></select></label>
+  <div class="row"><button id="play">▶ Play</button><button id="pause">Ⅱ Pause</button><button id="stop">■ Stop</button></div>
+  <label>Timeline <span id="timeLabel">0.00s</span><input id="timeline" type="range" min="0" max="1000" value="0"></label>
+  <label>Speed<select id="speed"><option>.25</option><option>.5</option><option selected>1</option><option>1.25</option><option>1.5</option><option>2</option></select></label>
+  <label class="check"><input id="loop" type="checkbox"> Loop</label>
+  <hr>
+  <h3>View</h3><div class="row"><button id="fit">Fit</button><button id="front">Front</button><button id="side">Side</button></div>
+  <label class="check"><input id="grid" type="checkbox" checked> Grid</label>
+  <label class="check"><input id="wire" type="checkbox"> Wireframe</label>
+  <hr>
+  <h3>Weapon transform</h3>
+  <div id="transformGrid" class="transform"></div>
+  <button id="resetWeapon">Reset Weapon</button>
+  <p class="small">The visible browser meshes are fallback GLBs for now. This lab is mainly for validating the real AKS-74U authored motion in-browser before integrating it into Dead Haul.</p>
+  <hr>
+  <h3>Load local GLBs</h3>
+  <label>Arms GLB<input id="localArms" type="file" accept=".glb,.gltf"></label>
+  <label>Weapon GLB<input id="localWeapon" type="file" accept=".glb,.gltf"></label>
+  <button id="loadLocal">Load local pair</button>
+  <div id="log" class="log"></div>
+</aside>
+</main>
+<script src="js/app.js"></script>
+</body></html>

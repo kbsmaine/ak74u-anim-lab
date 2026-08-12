@@ -1,0 +1,150 @@
+name: Extract UE5.5 AKS-74U + Build Test Site
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+    paths:
+      - 'unreal_source/**'
+      - 'tools/**'
+      - 'site/**'
+      - '.github/workflows/extract-and-build.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install Python converter dependency
+        run: python -m pip install --disable-pip-version-check numpy
+
+      - name: Clone current CUE4Parse source
+        run: |
+          rm -rf vendor/CUE4Parse
+          mkdir -p vendor
+          git clone --depth 1 --recurse-submodules https://github.com/FabianFG/CUE4Parse.git vendor/CUE4Parse
+          echo "CUE4Parse source revision:"
+          git -C vendor/CUE4Parse rev-parse HEAD
+
+      - name: Verify required CUE4Parse API exists
+        run: |
+          test -f vendor/CUE4Parse/CUE4Parse-Conversion/Options/ExportOptions.cs
+          test -f vendor/CUE4Parse/CUE4Parse-Conversion/ExportSession.cs
+          grep -q "namespace CUE4Parse_Conversion.Options" vendor/CUE4Parse/CUE4Parse-Conversion/Options/ExportOptions.cs
+          grep -q "class ExportSession" vendor/CUE4Parse/CUE4Parse-Conversion/ExportSession.cs
+          echo "Required source API found."
+
+      - name: Patch CUE4Parse for loose UE5.5 editor assets on Linux
+        run: |
+          python tools/patch_cue4parse_for_loose_assets.py vendor/CUE4Parse
+          grep -q "OperatingSystem.IsWindows" vendor/CUE4Parse/CUE4Parse-Conversion/ExportSession.cs
+          grep -q "forcing ACL-safe decoder for loose UE5.5 animation" vendor/CUE4Parse/CUE4Parse/UE4/Assets/Exports/Animation/UAnimSequence.cs
+          echo "Loose-asset patches applied."
+
+      - name: Restore extractor + CUE4Parse source dependencies
+        run: dotnet restore tools/Extractor/Extractor.csproj --force-evaluate
+
+      - name: Build CUE4Parse extractor
+        run: dotnet build tools/Extractor/Extractor.csproj -c Release --no-restore
+
+      - name: Extract UE5.5 skeletal meshes and animations to ActorX
+        id: extract
+        continue-on-error: true
+        run: |
+          rm -rf exports
+          mkdir -p exports
+          dotnet run --project tools/Extractor/Extractor.csproj -c Release --no-build -- unreal_source exports | tee extraction.log
+
+      - name: Show exported files
+        if: always()
+        run: |
+          echo "Extraction outcome: ${{ steps.extract.outcome }}"
+          find exports -type f -maxdepth 12 -print 2>/dev/null | sort | tee exported-files.txt || true
+
+      - name: Convert ActorX PSK/PSA to browser GLB
+        id: convert
+        if: steps.extract.outcome == 'success'
+        continue-on-error: true
+        run: |
+          rm -rf site/assets/extracted
+          mkdir -p site/assets/extracted
+          python tools/actorx_to_glb.py --exports exports --site site/assets/extracted | tee conversion.log
+
+      - name: Write build status
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p=Path('site/build-status.json')
+          manifest=Path('site/extracted-manifest.json')
+          data={
+            'extractOutcome': '${{ steps.extract.outcome }}',
+            'convertOutcome': '${{ steps.convert.outcome }}',
+            'realExtractionReady': False,
+          }
+          try:
+            m=json.loads(manifest.read_text())
+            data['realExtractionReady']=bool(m.get('ready')) and Path('site/assets/extracted/m4a1_fp_arms.glb').exists() and Path('site/assets/extracted/m4a1_weapon.glb').exists()
+            data['armsAnimations']=m.get('armsAnimations',[])
+            data['weaponAnimations']=m.get('weaponAnimations',[])
+          except Exception as e:
+            data['manifestError']=str(e)
+          p.write_text(json.dumps(data,indent=2))
+          print(p.read_text())
+          PY
+
+      - name: Upload raw ActorX extraction for debugging/download
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: actorx-extraction-and-logs
+          if-no-files-found: ignore
+          retention-days: 14
+          path: |
+            exports/**
+            extraction.log
+            conversion.log
+            exported-files.txt
+            site/build-status.json
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload browser test site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
