@@ -1,0 +1,150 @@
+name: Dump AKS-74U UE5.5 Editor JSON
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dump:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Download UAssetGUI experimental build
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force -Path tools\uassetgui | Out-Null
+          $headers = @{ 'User-Agent' = 'deadhaul-aks74u-editor-json' }
+          $rel = Invoke-RestMethod -Headers $headers -Uri 'https://api.github.com/repos/atenfyr/UAssetGUI/releases/tags/experimental-latest'
+          $asset = $rel.assets | Where-Object { $_.name -match 'UAssetGUI.*\.(zip|exe)$' } | Select-Object -First 1
+          if (-not $asset) {
+            Write-Host 'Available release assets:'
+            $rel.assets | ForEach-Object { Write-Host $_.name }
+            throw 'Could not find UAssetGUI release asset.'
+          }
+          $download = Join-Path 'tools\uassetgui' $asset.name
+          Write-Host "Downloading $($asset.name)"
+          Invoke-WebRequest -Headers $headers -Uri $asset.browser_download_url -OutFile $download
+          if ($download.ToLower().EndsWith('.zip')) {
+            Expand-Archive -Path $download -DestinationPath 'tools\uassetgui\app' -Force
+          } else {
+            New-Item -ItemType Directory -Force -Path 'tools\uassetgui\app' | Out-Null
+            Copy-Item $download 'tools\uassetgui\app\UAssetGUI.exe'
+          }
+          $exe = Get-ChildItem 'tools\uassetgui\app' -Recurse -Filter UAssetGUI.exe | Select-Object -First 1
+          if (-not $exe) { throw 'UAssetGUI.exe not found.' }
+          Write-Host "UAssetGUI: $($exe.FullName)"
+          "UASSETGUI_EXE=$($exe.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Dump AKS-74U animation editor data
+        id: animations
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Continue'
+          Remove-Item -Recurse -Force editor_json -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force -Path editor_json\animations | Out-Null
+          $root = 'unreal_source\Content\FP_AKS74U_Animation\AKS74U\Animations'
+          $targets = @(Get-ChildItem $root -File -Filter '*.uasset' | Where-Object {
+            $_.BaseName -like 'A_FP_*' -or $_.BaseName -like 'A_WBP_*'
+          } | Sort-Object Name)
+          Write-Host "Animation assets: $($targets.Count)"
+          $ok=0; $fail=0
+          foreach ($f in $targets) {
+            $dest = Join-Path 'editor_json\animations' ($f.BaseName + '.json')
+            $log  = Join-Path 'editor_json\animations' ($f.BaseName + '.log')
+            Write-Host "DUMP $($f.Name)"
+            & $env:UASSETGUI_EXE tojson $f.FullName $dest 5.5 2 2>&1 | Tee-Object -FilePath $log
+            if ($LASTEXITCODE -eq 0 -and (Test-Path $dest)) {
+              $ok++; Write-Host "OK $dest"
+            } else {
+              $fail++; Write-Host "FAIL $($f.Name) exit=$LASTEXITCODE"
+            }
+          }
+          "Animation JSON dumps: $ok successful, $fail failed" | Tee-Object -FilePath editor_json\animations\summary.txt
+          if ($ok -eq 0) { exit 1 }
+
+      - name: Analyze animation editor JSON
+        if: always()
+        shell: pwsh
+        run: |
+          python tools\summarize_animation_json.py editor_json\animations | Tee-Object -FilePath editor_json\animations\analysis.txt
+
+      - name: Dump AKS-74U and first-person arm mesh editor data
+        id: meshes
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Continue'
+          New-Item -ItemType Directory -Force -Path editor_json\meshes | Out-Null
+          $names = @(
+            'SK_AK74U.uasset',
+            'SK_AK74U_Skeleton.uasset',
+            'SM_AKS74U_Magazine.uasset',
+            'SK_FP_Manny_Simple.uasset',
+            'SKEL_UE5_Mannequin_Arms.uasset'
+          )
+          $ok=0; $fail=0
+          foreach ($name in $names) {
+            $matches = @(Get-ChildItem -Path 'unreal_source' -Recurse -File -Filter $name -ErrorAction SilentlyContinue)
+            "TARGET $name matches=$($matches.Count)" | Tee-Object -FilePath editor_json\meshes\discovery.txt -Append
+            if ($matches.Count -eq 0) { $fail++; continue }
+            $f = $matches | Select-Object -First 1
+            $dest = Join-Path 'editor_json\meshes' ($f.BaseName + '.json')
+            $log = Join-Path 'editor_json\meshes' ($f.BaseName + '.log')
+            Write-Host "DUMP $($f.FullName)"
+            try {
+              & $env:UASSETGUI_EXE tojson $f.FullName $dest VER_UE5_5 2>&1 | Tee-Object -FilePath $log
+              $code = $LASTEXITCODE
+            } catch {
+              $_ | Out-String | Tee-Object -FilePath $log -Append
+              $code = 999
+            }
+            if ($code -eq 0 -and (Test-Path $dest)) {
+              $ok++; Write-Host "OK $dest size=$((Get-Item $dest).Length)"
+            } else {
+              $fail++; Write-Host "FAIL $name exit=$code"
+            }
+          }
+          "Mesh JSON dumps: $ok successful, $fail failed" | Tee-Object -FilePath editor_json\meshes\summary.txt
+          if ($ok -eq 0) { exit 1 }
+
+      - name: Analyze mesh source JSON
+        if: always()
+        shell: pwsh
+        run: |
+          python tools\scan_mesh_json.py editor_json\meshes | Tee-Object -FilePath editor_json\meshes\analysis.txt
+
+      - name: Write combined summary
+        if: always()
+        shell: pwsh
+        run: |
+          $a = Get-Content editor_json\animations\summary.txt -ErrorAction SilentlyContinue
+          $m = Get-Content editor_json\meshes\summary.txt -ErrorAction SilentlyContinue
+          @(
+            'AKS-74U UE5.5 EDITOR JSON DUMP',
+            "animation step: ${{ steps.animations.outcome }}",
+            "mesh step: ${{ steps.meshes.outcome }}",
+            $a,
+            $m
+          ) | Set-Content editor_json\SUMMARY.txt
+          Get-Content editor_json\SUMMARY.txt
+
+      - name: Upload AKS-74U editor JSON artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aks74u-ue55-editor-json
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            editor_json/**

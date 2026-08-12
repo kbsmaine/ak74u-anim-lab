@@ -1,4 +1,7 @@
-Upload the CONTENTS of this folder to a new GitHub repo.
-Then enable Pages via GitHub Actions and run the workflow.
+1. Upload the CONTENTS of this folder to a new GitHub repo.
+2. Open Actions.
+3. Run: Dump AKS-74U UE5.5 Editor JSON
+4. Download the artifact: aks74u-ue55-editor-json
+5. Send that artifact ZIP back to ChatGPT.
 
-This AKS-74U lab uses the supplied UE5.5 AKS-74U pack and builds a browser animation tester without needing Unreal Engine installed locally.
+This intentionally uses the same UAssetGUI editor-JSON workflow that succeeded on the M4A1 pack.
