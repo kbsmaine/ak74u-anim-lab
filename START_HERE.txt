@@ -1,7 +1,0 @@
-1. Upload the CONTENTS of this folder to a new GitHub repo.
-2. Open Actions.
-3. Run: Dump AKS-74U UE5.5 Editor JSON
-4. Download the artifact: aks74u-ue55-editor-json
-5. Send that artifact ZIP back to ChatGPT.
-
-This intentionally uses the same UAssetGUI editor-JSON workflow that succeeded on the M4A1 pack.

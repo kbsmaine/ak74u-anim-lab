@@ -1,36 +1,24 @@
-# AKS-74U UE5.5 Editor JSON Dumper
+# AKS-74U Actual UE Browser Tester
 
-This is the **same extraction route that succeeded on the M4A1 pack** after the CUE4Parse/PSA route failed.
+This tester was built from the supplied UE5.5 editor JSON dump, using the same editor-curve approach that succeeded on the M4A1 pack.
 
-It uses the Windows build of **UAssetGUI/UAssetAPI** to read the uncooked UE5.5 editor assets directly and dump:
+## What is real from the AK pack
+- `SK_AK74U` source geometry: 13,361 vertices / 12,837 triangles
+- AK weapon controls: root, grip, trigger, bolt and magazine
+- all 14 `A_FP_AKS74U_*` first-person authored animation clips
+- weapon-side reload/fire Control Rig curves
+- tactical reload and empty reload are paired with their matching weapon animation
 
-- all AKS-74U first-person animation assets (`A_FP_*`)
-- AK weapon animation assets (`A_WBP_*`)
-- the actual `SK_AK74U` skeletal mesh source data
-- the AK skeleton
-- the separate AK magazine static mesh
-- the supplied `SK_FP_Manny_Simple` first-person mesh
-- the UE5 mannequin arms skeleton
+## Arms
+The visible arm mesh is the already-recovered actual UE first-person arms mesh from the M4 workflow. The AK pack's UE5 Manny Control Rig uses matching UE5 bone/control names, so all 89 AK arm controls are baked directly onto this skeleton with no Mixamo approximation.
 
-## Run it
+## Magazine note
+The AK pack stores the magazine as a separate `SM_AKS74U_Magazine` editor static mesh. Its source bulk mesh bytes were not serialized into this JSON artifact, so this first browser build uses a generated magazine proxy attached to the **real authored Magazine control**. The AK rifle body, bolt, trigger, arm motion and weapon motion are from the source assets.
 
-1. Create a new GitHub repository.
-2. Upload the **contents** of this folder to the repository root.
-3. Open **Actions**.
-4. Select **Dump AKS-74U UE5.5 Editor JSON**.
-5. Click **Run workflow**.
-6. When it finishes, download the artifact named:
-
-```text
-aks74u-ue55-editor-json
-```
-
-7. Send that artifact ZIP back to ChatGPT.
-
-## Why this is different from the previous AK lab
-
-The earlier AK test repo retried CUE4Parse's runtime/ActorX animation path. That was the wrong route for this job because these Marketplace files are uncooked editor assets.
-
-This repo instead uses the editor JSON approach that previously exposed the real Sequencer/Control Rig curves and editor mesh source geometry on the M4A1 pack.
-
-Once the artifact is returned, the next step is to bake the actual AKS-74U + FP arms + authored animations into a browser-ready GLB tester, and only after that integrate it into Dead Haul.
+## Controls
+- R: tactical reload
+- Shift+R: empty reload
+- F: fire
+- E: equip
+- Space: play/pause
+- mouse drag/wheel: orbit/zoom
