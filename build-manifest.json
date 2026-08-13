@@ -1,9 +1,10 @@
 {
-  "build": "aks74u-actual-ue-authored-v1",
-  "model": "assets/aks74u_ue_actual_arms_authored.glb",
+  "build": "aks74u-actual-ue-authored-v2-magfix",
+  "model": "assets/aks74u_ue_actual_arms_authored_magfix.glb",
   "weaponVertices": 13361,
   "weaponTriangles": 12837,
-  "proxyMagazineVertices": 120,
+  "proxyMagazineVertices": 192,
+  "proxyMagazineTriangles": 380,
   "animations": [
     {
       "name": "A_FP_AKS74U_Aim_Loop",
@@ -108,6 +109,6 @@
     "weaponMesh": "Actual SK_AK74U source geometry reconstructed from UE5.5 editor skeletal-mesh raw source",
     "armsMesh": "Actual UE first-person arms mesh already recovered from the M4 pack; AK Manny Control Rig curves map 1:1 onto the shared UE5 skeleton names",
     "animations": "Actual AKS-74U authored AnimationSequencerDataModel Control Rig curves",
-    "magazine": "Generated proxy attached to the actual authored Magazine control because the separate SM_AKS74U_Magazine editor bulk mesh was not serialized into the JSON dump"
+    "magazine": "Improved AK-style curved magazine proxy attached to the real authored Magazine control. The source JSON still lacked the original static-mesh vertex payload, so this build replaces the old blocky placeholder with a cleaner shaped proxy."
   }
 }

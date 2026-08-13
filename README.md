@@ -22,3 +22,8 @@ The AK pack stores the magazine as a separate `SM_AKS74U_Magazine` editor static
 - E: equip
 - Space: play/pause
 - mouse drag/wheel: orbit/zoom
+
+
+MAGAZINE UPDATE
+- Replaced the old staircase placeholder with a cleaner curved AK-style magazine proxy attached to the real authored Magazine_CONTROL animation.
+- The original static mesh vertex payload for SM_AKS74U_Magazine still was not present in the editor JSON dump, so this is a visual proxy, not the exact marketplace magazine geometry.
