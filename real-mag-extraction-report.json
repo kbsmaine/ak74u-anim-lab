@@ -1,0 +1,28 @@
+{
+  "sourceFile": "SM_AKS74U_Magazine.uasset",
+  "packageBytes": 45507,
+  "compressedBufferOffset": 17820,
+  "magic": "0xb7756362",
+  "crc32": "0x4f12312c",
+  "method": 3,
+  "compressor": 3,
+  "level": 3,
+  "blockSizeExponent": 18,
+  "blockCount": 1,
+  "rawTotal": 154805,
+  "compressedTotal": 27667,
+  "blockCompressedSizes": [
+    27599
+  ],
+  "rawHash": "5f3b645e1f6de20fe79d9f5bb6ef61ab541a0a3c",
+  "headerTail": "3f04ea3781dc2df81f31837d",
+  "decodedSha256": "b5c19e3a5fd0db03c9042aa2cc9cf4f85bd108b118b970de36d824a8877d156f",
+  "decodedBytes": 154805,
+  "expectedMeshMetadata": {
+    "vertices": 638,
+    "triangles": 636,
+    "uvChannels": 2,
+    "materials": 1
+  },
+  "note": "Decoded bytes are the original Unreal FMeshDescription payload for SM_AKS74U_Magazine, not a reconstructed proxy."
+}

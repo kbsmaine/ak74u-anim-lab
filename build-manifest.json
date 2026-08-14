@@ -1,0 +1,124 @@
+{
+  "build": "aks74u-actual-ue-authored-real-mag-v4",
+  "model": "assets/aks74u_ue_actual_arms_authored_REAL_MAG.glb",
+  "weaponVertices": 13361,
+  "weaponTriangles": 12837,
+  "animations": [
+    {
+      "name": "A_FP_AKS74U_Aim_Loop",
+      "frames": 61,
+      "seconds": 2.0,
+      "channels": 188,
+      "weaponClip": null
+    },
+    {
+      "name": "A_FP_AKS74U_Aim_Pose",
+      "frames": 2,
+      "seconds": 0.0333,
+      "channels": 188,
+      "weaponClip": null
+    },
+    {
+      "name": "A_FP_AKS74U_Equipe",
+      "frames": 21,
+      "seconds": 0.6667,
+      "channels": 188,
+      "weaponClip": null
+    },
+    {
+      "name": "A_FP_AKS74U_Fire",
+      "frames": 13,
+      "seconds": 0.4,
+      "channels": 188,
+      "weaponClip": "A_WBP_Reference_Fire"
+    },
+    {
+      "name": "A_FP_AKS74U_Fire_Aimed",
+      "frames": 13,
+      "seconds": 0.4,
+      "channels": 188,
+      "weaponClip": "A_WBP_Reference_Fire"
+    },
+    {
+      "name": "A_FP_AKS74U_Idle_Loop",
+      "frames": 61,
+      "seconds": 2.0,
+      "channels": 188,
+      "weaponClip": null
+    },
+    {
+      "name": "A_FP_AKS74U_Idle_Pose",
+      "frames": 2,
+      "seconds": 0.0333,
+      "channels": 188,
+      "weaponClip": null
+    },
+    {
+      "name": "A_FP_AKS74U_Reload",
+      "frames": 74,
+      "seconds": 2.4333,
+      "channels": 188,
+      "weaponClip": "A_WBP_AKS74U_Reload_UnEmpty"
+    },
+    {
+      "name": "A_FP_AKS74U_Reload_Aimed",
+      "frames": 74,
+      "seconds": 2.4333,
+      "channels": 188,
+      "weaponClip": "A_WBP_AKS74U_Reload_UnEmpty"
+    },
+    {
+      "name": "A_FP_AKS74U_Reload_Empty",
+      "frames": 96,
+      "seconds": 3.1667,
+      "channels": 188,
+      "weaponClip": "A_WBP_AKS74U_Reload"
+    },
+    {
+      "name": "A_FP_AKS74U_Reload_Empty_Aimed",
+      "frames": 96,
+      "seconds": 3.1667,
+      "channels": 188,
+      "weaponClip": "A_WBP_AKS74U_Reload"
+    },
+    {
+      "name": "A_FP_AKS74U_Run_Loop",
+      "frames": 21,
+      "seconds": 0.6667,
+      "channels": 188,
+      "weaponClip": null
+    },
+    {
+      "name": "A_FP_AKS74U_Walk_F_Loop",
+      "frames": 25,
+      "seconds": 0.8,
+      "channels": 188,
+      "weaponClip": null
+    },
+    {
+      "name": "A_FP_AKS74U_Walk_F_Loop_Aimed",
+      "frames": 25,
+      "seconds": 0.8,
+      "channels": 188,
+      "weaponClip": null
+    }
+  ],
+  "notes": {
+    "weaponMesh": "Actual SK_AK74U source geometry reconstructed from UE5.5 editor skeletal-mesh raw source",
+    "armsMesh": "Actual UE first-person arms mesh already recovered from the M4 pack; AK Manny Control Rig curves map 1:1 onto the shared UE5 skeleton names",
+    "animations": "Actual AKS-74U authored AnimationSequencerDataModel Control Rig curves",
+    "magazine": "Actual SM_AKS74U_Magazine FMeshDescription geometry recovered from the original compressed UE5.5 package payload; no proxy."
+  },
+  "realMagazine": {
+    "source": "SM_AKS74U_Magazine original UE5.5 FMeshDescription package payload",
+    "sourcePositionVertices": 615,
+    "vertexInstances": 1908,
+    "triangles": 636,
+    "uv0": true,
+    "normals": true,
+    "proxy": false,
+    "attachedTo": "AK:Magazine / Magazine_CONTROL",
+    "decodedPayloadBytes": 154805,
+    "decodedPayloadSha256": "b5c19e3a5fd0db03c9042aa2cc9cf4f85bd108b118b970de36d824a8877d156f"
+  }
+}

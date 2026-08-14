@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AKS-74U Actual UE Animation Lab</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+<script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+</head>
+<body>
+<header><div><b>AKS-74U ACTUAL UE LAB</b><span>actual AK + actual magazine + UE FP arms + authored AK animations</span></div><div id="status" class="pill">Loading…</div></header>
+<main>
+<section id="viewport"><canvas id="renderCanvas"></canvas><div id="hint">R reload · Shift+R empty reload · F fire · E equip · Space play/pause</div></section>
+<aside>
+  <div class="presets"><button data-preset="reload">Reload</button><button data-preset="reload_full">Empty Reload</button><button data-preset="fire">Fire</button><button data-preset="fire_aimed">Aimed Fire</button><button data-preset="equip">Equip</button><button data-preset="idle">Idle</button><button data-preset="aim">Aim</button><button data-preset="walk">Walk</button><button data-preset="run">Run</button></div>
+  <label>Authored animation<select id="anim"></select></label>
+  <div class="row"><button id="play">▶ Play</button><button id="pause">Ⅱ Pause</button><button id="stop">■ Stop</button></div>
+  <label>Timeline <span id="timeLabel">0.00s</span><input id="timeline" type="range" min="0" max="1000" value="0"></label>
+  <label>Speed<select id="speed"><option>.25</option><option>.5</option><option selected>1</option><option>1.25</option><option>1.5</option><option>2</option></select></label>
+  <label class="check"><input id="loop" type="checkbox"> Loop</label>
+  <hr><h3>View</h3><div class="row"><button id="fit">Fit</button><button id="front">Front</button><button id="side">Side</button></div>
+  <label class="check"><input id="grid" type="checkbox" checked> Grid</label><label class="check"><input id="wire" type="checkbox"> Wireframe</label>
+  <hr><h3>Whole rig transform</h3><div id="transformGrid" class="transform"></div><button id="resetRig">Reset Rig</button>
+  <p class="small">This build uses the actual AKS-74U source geometry, the actual SM_AKS74U_Magazine FMeshDescription geometry recovered from the original UE5.5 package payload, and the actual AK-authored Control Rig curves. There is no generated magazine proxy in this build.</p>
+  <div id="log" class="log"></div>
+</aside>
+</main>
+<script src="js/app.js"></script>
+</body></html>
